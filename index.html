@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stillF&nbsp;-&nbsp;TableJSON</title>
+
+    <link rel="stylesheet" type="text/css" href="/TableJSON/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/TableJSON/css/fontawesome-all.css">
+    <link rel="stylesheet" type="text/css" href="/TableJSON/css/vue-good-table.min.css">
+    <script type="text/javascript" src="/TableJSON/js/popper.min.js"></script>
+    <script type="text/javascript" src="/TableJSON/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/TableJSON/js/vue.js"></script>
+    <script type="text/javascript" src="/TableJSON/js/lodash.js"></script>
+    <script type="text/javascript" src="/TableJSON/js/vue-good-table.min.js"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/fontawesome-all.css">
+    <link rel="stylesheet" type="text/css" href="./css/vue-good-table.min.css">
+    <script type="text/javascript" src="./js/popper.min.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./js/vue.js"></script>
+    <script type="text/javascript" src="./js/lodash.js"></script>
+    <script type="text/javascript" src="./js/vue-good-table.min.js"></script>-->
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+        <div class="container-fluid">
+            <a href="https://stillf.github.io/" class="navbar-brand" style="color:#ffffff;margin-left:10px;font-size:18px;" target="_blank">stillF&ensp;信柴柴，得第一</a>
+        </div>
+    </nav>
+    <main class="container" style="margin-bottom:50px;" id="stock">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div style="color:#333;font-size:22px;font-weight:bold;">
+                TableJSON
+                <a href="https://github.com/stillF/TableJSON" style="margin-left:5px;" target="_blank"><i class="fas fa-link"></i></a>
+            </div>
+            <hr>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        JSON
+                        <a class="btn btn-primary" href="https://data.gov.tw/" target="_blank" role="button" style="padding: 1px 5px;font-size: 12px;"><i class="fas fa-globe"></i></a>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-danger btn-sm" style="margin-bottom:10px;padding: 1px 5px;font-size: 12px;" v-on:click="cleanTxt">清除</button>
+                        <div class="input-group input-group-sm mb-3">
+                            <button class="btn btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">keys</button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item" v-on:click="clickKeyALL">ALL</li>
+                                <li class="dropdown-item" v-on:click="clickKey1">key1</li>
+                                <li class="dropdown-item" v-on:click="clickKey2">key2</li>
+                                <li class="dropdown-item" v-on:click="clickKey3">key3</li>
+                            </ul>
+                            <input type="text" class="form-control" v-model="keysTxt1">
+                            <input type="text" class="form-control" v-model="keysTxt2">
+                            <input type="text" class="form-control" v-model="keysTxt3">
+                        </div>
+                        <textarea class="form-control" rows="3" v-model="jsonTxt"></textarea>
+                        <div class="d-grid gap-2 " style="margin-top:20px;">
+                            <button class="btn btn-primary btn-sm" type="button" style="margin-bottom:20px;" v-on:click="searchEvent">GO</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;"></div>
+                <div class="card">
+                    <div class="card-header">資料</div>
+                    <div class="card-body">
+                        <span>總筆數：{{ total_number }}</span>
+                        <template>
+                            <div>
+                                <vue-good-table :line-numbers="true" :columns="columns" :rows="rows" :search-options="{enabled: true}" :pagination-options="{enabled: true,mode: 'pages',}" />
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="JsonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        JSON.parse
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body"><pre>{{ jsonModalTxt }}</pre></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="footer py-1 bg-dark">
+        <div class="container text-center">
+            <span style="color:#ffffff;font-size:14px;">© Copyright 2022. All Rights Reserved.</span>
+        </div>
+    </footer>
+
+    <script>
+        new Vue({
+            el: '#stock',
+            data: {
+                keysTxt1: '',
+                keysTxt2: '',
+                keysTxt3: '',
+                jsonTxt: '',
+                jsonModalTxt: '',
+                total_number: 0,
+                columns: [],
+                rows: [],
+            },
+            methods: {
+                searchEvent: function () {
+                    this.columns = [];
+                    this.rows = [];
+                    this.total_number = 0;
+
+                    let keysTxt1 = _.trim(this.keysTxt1);
+                    let keysTxt2 = _.trim(this.keysTxt2);
+                    let keysTxt3 = _.trim(this.keysTxt3);
+                    let obj = JSON.parse(this.jsonTxt);
+                    let _columns = [];
+                    let _list = [];
+
+                    if (keysTxt1 === "") {
+                        //都沒有key
+                        _list = obj;
+                        //console.log(obj);
+                    } else {
+                        if (keysTxt2 === "") {
+                            //key1
+                            _list = obj[keysTxt1];
+                        } else {
+                            if (keysTxt3 === "") {
+                                //key1+key2
+                                _list = obj[keysTxt1][keysTxt2];
+                            } else {
+                                //key1+key2+key3
+                                _list = obj[keysTxt1][keysTxt2][keysTxt3];
+                            }
+                        }
+                    }
+
+                    let _key = Object.keys(_list[0]);
+                    _.forEach(_key, function (value) {
+                        _columns.push({
+                            label: value,
+                            field: value
+                        });
+                    });
+
+                    this.columns = _columns;
+                    this.rows = _list;
+                    this.total_number = _list.length;
+                },
+                clickKeyALL: function () {
+                    let obj = JSON.parse(this.jsonTxt);
+                    this.jsonModalTxt = obj;
+                    let JsonModal = new bootstrap.Modal(document.getElementById('JsonModal'), {});
+                    JsonModal.show();
+                },
+                clickKey1: function () {
+                    let obj = JSON.parse(this.jsonTxt);
+                    let keysTxt1 = _.trim(this.keysTxt1);
+                    if (keysTxt1 !== "") {
+                        this.jsonModalTxt = obj[keysTxt1];
+                        let JsonModal = new bootstrap.Modal(document.getElementById('JsonModal'), {});
+                        JsonModal.show();
+                    }
+                },
+                clickKey2: function () {
+                    let obj = JSON.parse(this.jsonTxt);
+                    let keysTxt1 = _.trim(this.keysTxt1);
+                    let keysTxt2 = _.trim(this.keysTxt2);
+                    if (keysTxt1 !== "" && keysTxt2 !== "") {
+                        this.jsonModalTxt = obj[keysTxt1][keysTxt2];
+                        let JsonModal = new bootstrap.Modal(document.getElementById('JsonModal'), {});
+                        JsonModal.show();
+                    }
+                },
+                clickKey3: function () {
+                    let obj = JSON.parse(this.jsonTxt);
+                    let keysTxt1 = _.trim(this.keysTxt1);
+                    let keysTxt2 = _.trim(this.keysTxt2);
+                    let keysTxt3 = _.trim(this.keysTxt3);
+                    if (keysTxt1 !== "" && keysTxt2 !== "" && keysTxt3 !== "") {
+                        this.jsonModalTxt = obj[keysTxt1][keysTxt2][keysTxt3];
+                        let JsonModal = new bootstrap.Modal(document.getElementById('JsonModal'), {});
+                        JsonModal.show();
+                    }
+                },
+                cleanTxt: function () {
+                    this.keysTxt1 = '';
+                    this.keysTxt2 = '';
+                    this.keysTxt3 = '';
+                    this.jsonTxt = '';
+                    this.columns = [];
+                    this.rows = [];
+                    this.total_number = 0;
+                }
+            }
+        })
+    </script>
+</body>
+</html>
