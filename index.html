@@ -86,7 +86,10 @@
                         JSON.parse
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body"><pre>{{ jsonModalTxt }}</pre></div>
+                    <div class="modal-body">
+                        <button type="button" class="btn btn-success btn-sm" style="margin-bottom:10px;padding: 1px 5px;font-size: 12px;" v-on:click="copyTxt">複製</button>
+                        <pre id="jsonModalPre">{{ jsonModalTxt }}</pre>                    
+                    </div>
                 </div>
             </div>
         </div>
@@ -198,6 +201,14 @@
                     this.columns = [];
                     this.rows = [];
                     this.total_number = 0;
+                },
+                copyTxt: function () {
+                    let _pre = document.querySelector("#jsonModalPre");
+                    let _range = document.createRange();
+                    _range.selectNode(_pre);
+                    window.getSelection().addRange(_range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
                 }
             }
         })
