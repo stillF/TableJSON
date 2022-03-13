@@ -68,10 +68,10 @@
                 <div class="card">
                     <div class="card-header">資料</div>
                     <div class="card-body">
-                        <span>總筆數：{{ total_number }}</span>
+                        <span style="display:none">筆數：{{ total_number }}</span>
                         <template>
                             <div>
-                                <vue-good-table :line-numbers="true" :columns="columns" :rows="rows" :search-options="{enabled: true}" :pagination-options="{enabled: true,mode: 'pages',}" />
+                                <vue-good-table :line-numbers="true" :columns="columns" :rows="rows" :search-options="{enabled: true}" :pagination-options="{enabled: true,mode: 'records'}" />
                             </div>
                         </template>
                     </div>
