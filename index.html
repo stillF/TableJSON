@@ -71,7 +71,7 @@
                         <span style="display:none">筆數：{{ total_number }}</span>
                         <template>
                             <div>
-                                <vue-good-table :line-numbers="true" :columns="columns" :rows="rows" :search-options="{enabled: true}" :pagination-options="{enabled: true,mode: 'records'}" />
+                                <vue-good-table :line-numbers="true" :columns="columns" :rows="rows" :search-options="{enabled: true}" :pagination-options="{enabled: true,mode: 'records',position: 'top'}" max-height="450px" />
                             </div>
                         </template>
                     </div>
